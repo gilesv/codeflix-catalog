@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  catalog:
+    build: .
+    container_name: codeflix_catalog_api
+    tty: true
+    volumes:
+      - .:/home/node/app
+      - node_modules:/home/node/app/node_modules
+    networks:
+      - catalog-net
+    ports:
+      - 3000:8080
+    depends_on:
+      - db
+
+  # nginx:
+  #   build: ./nginx
+  #   container_name: codeflix_catalog_nginx
+  #   networks:
+  #     - catalog-net
+  #   ports:
+  #     - 8080:80
+  #   depends_on:
+  #     - nodeapi
+
+  db:
+    image: postgres
+    container_name: codeflix_catalog_db
+    environment:
+      - POSTGRES_DB=catalog
+      - POSTGRES_USER=catalog
+      - POSTGRES_PASSWORD=catalog
+    restart: always
+    tty: true
+    ports:
+      - 5432:5432
+    networks:
+      - catalog-net
+    volumes:
+      - pgdata:/usr/postgresql/data
+
+networks:
+  catalog-net:
+    driver: bridge
+
+volumes:
+  node_modules:
+  pgdata:
+
