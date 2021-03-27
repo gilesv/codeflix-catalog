@@ -17,3 +17,11 @@ model Category {
   // author    User?    @relation(fields: [authorId], references: [id])
   // authorId  Int?
 }
+
+model Genre {
+  id            String      @id @default(uuid())
+  name          String
+  isActive      Boolean?    @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime?
+}
