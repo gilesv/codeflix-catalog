@@ -6,7 +6,7 @@ import { CategoryService } from './category.service';
 import CategoryFactory from './category.factory';
 import { CreateCategoryDto } from './dto/create-category.dto';
 
-describe('CategoryController', () => {
+describe('Category endpoint', () => {
   let module: TestingModule;
   let app: INestApplication;
   let categoryService = {

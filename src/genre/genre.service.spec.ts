@@ -3,7 +3,6 @@ import { GenreService } from './genre.service';
 import { DbService } from '../db/db.service';
 import { Genre } from '.prisma/client';
 import { CreateGenreDto } from './dto/create-genre.dto';
-import { UpdateCategoryDto } from 'src/category/dto/update-category.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
 
 function NewGenre(name: string = 'Genre', isActive: boolean = true): Genre {
