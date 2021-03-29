@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DbService } from 'src/db/db.service';
+import { DbService } from '../db/db.service';
 import { Genre } from '@prisma/client';
 import { CreateGenreDto } from './dto/create-genre.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
