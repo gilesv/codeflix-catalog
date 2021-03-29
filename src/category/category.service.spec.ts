@@ -1,18 +1,108 @@
+import { Category } from '@prisma/client';
 import { Test, TestingModule } from '@nestjs/testing';
+import { DbService } from '../db/db.service';
 import { CategoryService } from './category.service';
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
+import { NotFoundException } from '@nestjs/common';
+
+function NewCategory(
+  name: string = 'Category',
+  description: string = 'Great movies',
+  isActive: boolean = true,
+): Category {
+  return {
+    id: '00000-00000-00000-0000A1',
+    name,
+    description,
+    isActive,
+    createdAt: new Date(),
+    updatedAt: null,
+  };
+}
 
 describe('CategoryService', () => {
-  let service: CategoryService;
+  let categoryService: CategoryService;
+  let dbService: DbService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [CategoryService],
+      providers: [ CategoryService, DbService ],
     }).compile();
 
-    service = module.get<CategoryService>(CategoryService);
+    categoryService = module.get<CategoryService>(CategoryService);
+    dbService = module.get<DbService>(DbService);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(categoryService).toBeDefined();
+  });
+
+  it('create should create a new category', async () => {
+    let category = NewCategory();
+    jest.spyOn(dbService.category, 'create')
+      .mockResolvedValueOnce(category as any);
+
+    let result = await categoryService.create(new CreateCategoryDto());
+    expect(result).toBe(category);
+  });
+
+  it('findAll should list all categories', async () => {
+    let categories = [NewCategory(), NewCategory(), NewCategory()];
+    jest.spyOn(dbService.category, 'findMany')
+      .mockResolvedValueOnce(categories as any);
+
+    let result = await categoryService.findAll();
+    expect(result).toBe(categories);
+  });
+
+  it('findOne should find one category', async () => {
+    let category = NewCategory();
+
+    jest.spyOn(dbService.category, 'findFirst')
+      .mockResolvedValueOnce(category as any);
+
+    let result = await categoryService.findOne('000-000-000-000');
+    expect(result).toBe(category);
+  });
+
+  describe('update', () => {
+    it('should update a category', async () => {
+      let category = NewCategory('Category A');
+      let result = NewCategory('Category B');
+
+      jest.spyOn(dbService.category, 'findFirst').mockResolvedValueOnce(category as any);
+      jest.spyOn(dbService.category, 'update').mockResolvedValueOnce(result as any);
+
+      expect(await categoryService.update('cat123', new UpdateCategoryDto())).toBe(result);
+    });
+
+    it('should throw error if tries to update a not found category', async () => {
+      jest.spyOn(dbService.category, 'findFirst').mockResolvedValueOnce(null);
+
+      await expect(categoryService.update('cat123', new UpdateCategoryDto()))
+        .rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('remove', () => {
+    it('should remove a category', async () => {
+      jest.spyOn(dbService.category, 'update').mockImplementation(jest.fn());
+      jest.spyOn(dbService.category, 'findFirst').mockResolvedValueOnce(NewCategory());
+
+      await categoryService.remove('000-000-000-001');
+      expect(dbService.category.update).toHaveBeenCalledWith({
+        where: { id: '000-000-000-001' },
+        data: { isActive: false }
+      });
+    });
+
+    it('should throw error if tries to remove a not found category', async () => {
+      jest.spyOn(dbService.category, 'update').mockImplementation(jest.fn());
+      jest.spyOn(dbService.category, 'findFirst').mockResolvedValueOnce(null);
+
+      await expect(categoryService.remove('000-000-000-001'))
+        .rejects.toThrow(NotFoundException);
+    });
   });
 });
