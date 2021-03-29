@@ -5,21 +5,7 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { NotFoundException } from '@nestjs/common';
-
-function NewCategory(
-  name: string = 'Category',
-  description: string = 'Great movies',
-  isActive: boolean = true,
-): Category {
-  return {
-    id: '00000-00000-00000-0000A1',
-    name,
-    description,
-    isActive,
-    createdAt: new Date(),
-    updatedAt: null,
-  };
-}
+import CategoryFactory from './category.factory';
 
 describe('CategoryService', () => {
   let categoryService: CategoryService;
@@ -39,7 +25,7 @@ describe('CategoryService', () => {
   });
 
   it('create should create a new category', async () => {
-    let category = NewCategory();
+    let category = CategoryFactory.new();
     jest.spyOn(dbService.category, 'create')
       .mockResolvedValueOnce(category as any);
 
@@ -48,7 +34,7 @@ describe('CategoryService', () => {
   });
 
   it('findAll should list all categories', async () => {
-    let categories = [NewCategory(), NewCategory(), NewCategory()];
+    let categories = [CategoryFactory.new(), CategoryFactory.new(), CategoryFactory.new()];
     jest.spyOn(dbService.category, 'findMany')
       .mockResolvedValueOnce(categories as any);
 
@@ -57,7 +43,7 @@ describe('CategoryService', () => {
   });
 
   it('findOne should find one category', async () => {
-    let category = NewCategory();
+    let category = CategoryFactory.new();
 
     jest.spyOn(dbService.category, 'findFirst')
       .mockResolvedValueOnce(category as any);
@@ -68,8 +54,8 @@ describe('CategoryService', () => {
 
   describe('update', () => {
     it('should update a category', async () => {
-      let category = NewCategory('Category A');
-      let result = NewCategory('Category B');
+      let category = CategoryFactory.new('Category A');
+      let result = CategoryFactory.new('Category B');
 
       jest.spyOn(dbService.category, 'findFirst').mockResolvedValueOnce(category as any);
       jest.spyOn(dbService.category, 'update').mockResolvedValueOnce(result as any);
@@ -88,7 +74,7 @@ describe('CategoryService', () => {
   describe('remove', () => {
     it('should remove a category', async () => {
       jest.spyOn(dbService.category, 'update').mockImplementation(jest.fn());
-      jest.spyOn(dbService.category, 'findFirst').mockResolvedValueOnce(NewCategory());
+      jest.spyOn(dbService.category, 'findFirst').mockResolvedValueOnce(CategoryFactory.new());
 
       await categoryService.remove('000-000-000-001');
       expect(dbService.category.update).toHaveBeenCalledWith({
