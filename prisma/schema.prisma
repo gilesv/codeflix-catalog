@@ -25,3 +25,18 @@ model Genre {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime?
 }
+
+// CAST MEMBER
+enum CastMemberKind {
+  DIRECTOR
+  ACTOR
+}
+
+model CastMember {
+  id            String          @id @default(uuid())
+  name          String
+  type          CastMemberKind  @default(ACTOR)
+  isActive      Boolean?        @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime?
+}
