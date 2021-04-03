@@ -39,7 +39,7 @@ services:
     networks:
       - catalog-net
     volumes:
-      - pgdata:/usr/postgresql/data
+      - pgdata:/var/lib/postgresql/data
 
 networks:
   catalog-net:
