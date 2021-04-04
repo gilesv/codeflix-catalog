@@ -4,13 +4,20 @@ import { DbService } from '../db/db.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { CategoryService } from '../category/category.service';
+import { GenreService } from '../genre/genre.service';
 
 @Injectable()
 export class MovieService {
-  constructor(private db: DbService, private categoryService: CategoryService) {}
+  constructor(
+    private db: DbService,
+    private categoryService: CategoryService,
+    private genreService: GenreService
+  ) {}
 
   async create(createMovieDto: CreateMovieDto): Promise<Movie> {
     let categories = await this.processCategories(createMovieDto.categories);
+    let genres = await this.processGenres(createMovieDto.genres);
+
     return await this.db.movie.create({
       data: {
         title: createMovieDto.title,
@@ -18,9 +25,13 @@ export class MovieService {
         releaseYear: createMovieDto.releaseYear,
         isAvailable: createMovieDto.isAvailable,
         categories: { connect: categories },
+        genres: { connect: genres },
       },
       include: {
         categories: {
+          select: { id: true, name: true }
+        },
+        genres: {
           select: { id: true, name: true }
         }
       }
@@ -30,13 +41,25 @@ export class MovieService {
   private async processCategories(categoryIds: string[]): Promise<{ id: string }[]> {
     let categories = [];
     for (let categoryId of categoryIds) {
-      let exists = await this.categoryService.findOne(categoryId)
+      let exists = await this.categoryService.findOne(categoryId);
       if (!exists) {
         throw new NotFoundException(`Category with id '${categoryId}' not found`);
       } 
       categories.push({ id: categoryId });
     }
     return categories;
+  }
+
+  private async processGenres(genreIds: string[]): Promise<{ id: string }[]> {
+    let genres = [];
+    for (let genreId of genreIds) {
+      let exists = await this.genreService.findOne(genreId)
+      if (!exists) {
+        throw new NotFoundException(`Genre with id '${genreId}' not found`);
+      } 
+      genres.push({ id: genreId });
+    }
+    return genres;
   }
 
   async findAll(): Promise<Movie[]> {

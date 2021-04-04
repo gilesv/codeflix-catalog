@@ -25,6 +25,7 @@ model Genre {
   isActive      Boolean?    @default(true)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime?
+  movies        Movie[]
 }
 
 enum CastMemberKind {
@@ -51,4 +52,5 @@ model Movie {
   createdAt     DateTime        @default(now())
   updatedAt     DateTime?
   categories    Category[]
+  genres        Genre[]
 }

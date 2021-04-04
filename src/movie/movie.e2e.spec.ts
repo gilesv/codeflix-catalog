@@ -4,9 +4,7 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MovieModule } from './movie.module';
 import { MovieService } from './movie.service';
-import { CategoryService } from 'src/category/category.service';
 import MovieFactory from './movie.factory';
-import { CreateMovieDto } from './dto/create-movie.dto';
 
 describe('Movie endpoint', () => {
   let module: TestingModule;
@@ -86,6 +84,7 @@ describe('Movie endpoint', () => {
         releaseYear: 2021,
         isAvailable: true,
         categories: ["abc123", "def123"],
+        genres: ["abc123", "agua"],
       };
 
       let result = MovieFactory.new();
@@ -106,7 +105,8 @@ describe('Movie endpoint', () => {
         synopsis: null,
         releaseYear: true,
         isAvailable: 123,
-        categories: "hey"
+        categories: "hey",
+        genres: undefined,
       };
       await request(app.getHttpServer())
         .post('/movies')

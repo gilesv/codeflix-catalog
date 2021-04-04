@@ -14,5 +14,8 @@ export class CreateMovieDto {
   isAvailable: boolean;
 
   @IsArray()
-  categories: string[] = [];
+  categories: string[];
+
+  @IsArray()
+  genres: string[];
 }
