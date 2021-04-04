@@ -5,6 +5,7 @@ import { DbModule } from '../db/db.module';
 
 @Module({
   imports: [DbModule],
+  exports: [CategoryService],
   controllers: [CategoryController],
   providers: [CategoryService]
 })

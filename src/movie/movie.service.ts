@@ -3,21 +3,40 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
+import { CategoryService } from '../category/category.service';
 
 @Injectable()
 export class MovieService {
-  constructor(private db: DbService) {}
+  constructor(private db: DbService, private categoryService: CategoryService) {}
 
   async create(createMovieDto: CreateMovieDto): Promise<Movie> {
-    let { title, synopsis, releaseYear, isAvailable } = createMovieDto;
+    let categories = await this.processCategories(createMovieDto.categories);
     return await this.db.movie.create({
       data: {
-        title,
-        synopsis,
-        releaseYear: Number(releaseYear),
-        isAvailable: Boolean(isAvailable),
+        title: createMovieDto.title,
+        synopsis: createMovieDto.synopsis,
+        releaseYear: createMovieDto.releaseYear,
+        isAvailable: createMovieDto.isAvailable,
+        categories: { connect: categories },
+      },
+      include: {
+        categories: {
+          select: { id: true, name: true }
+        }
       }
-    })
+    });
+  }
+
+  private async processCategories(categoryIds: string[]): Promise<{ id: string }[]> {
+    let categories = [];
+    for (let categoryId of categoryIds) {
+      let exists = await this.categoryService.findOne(categoryId)
+      if (!exists) {
+        throw new NotFoundException(`Category with id '${categoryId}' not found`);
+      } 
+      categories.push({ id: categoryId });
+    }
+    return categories;
   }
 
   async findAll(): Promise<Movie[]> {

@@ -1,4 +1,4 @@
-import { IsBooleanString, IsDefined, IsNotEmpty, IsNumberString } from "class-validator";
+import { IsArray, IsBoolean, IsDefined, IsNotEmpty, IsNumber } from "class-validator";
 
 export class CreateMovieDto {
   @IsNotEmpty()
@@ -7,9 +7,12 @@ export class CreateMovieDto {
   @IsDefined()
   synopsis: string;
 
-  @IsNumberString()
+  @IsNumber()
   releaseYear: number;
 
-  @IsBooleanString()
+  @IsBoolean()
   isAvailable: boolean;
+
+  @IsArray()
+  categories: string[] = [];
 }

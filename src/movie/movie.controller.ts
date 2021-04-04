@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, NotFoundException } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
@@ -20,7 +20,11 @@ export class MovieController {
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return await this.movieService.findOne(id);
+    let movie = await this.movieService.findOne(id);
+    if (!movie) {
+      throw new NotFoundException();
+    }
+    return movie;
   }
 
   @Patch(':id')
