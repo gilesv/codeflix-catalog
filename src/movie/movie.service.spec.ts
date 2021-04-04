@@ -90,11 +90,21 @@ describe('MovieService', () => {
     it('should update a movie', async () => {
       let movie = MovieFactory.new('Movie A');
       let result = MovieFactory.new('Movie B');
+      let category = CategoryFactory.new();
+      let genre = GenreFactory.new();
 
       jest.spyOn(dbService.movie, 'findUnique').mockResolvedValueOnce(movie);
-      jest.spyOn(dbService.movie, 'update').mockResolvedValueOnce(result as any);
+      jest.spyOn(dbService.movie, 'update').mockResolvedValueOnce(result);
+      jest.spyOn(categoryService, 'findOne').mockResolvedValueOnce(category);
+      jest.spyOn(genreService, 'findOne').mockResolvedValueOnce(genre);
 
-      expect(await movieService.update('cat123', new UpdateMovieDto())).toBe(result);
+      let dto = new UpdateMovieDto();
+      dto.categories = ["a"];
+      dto.genres = ["b"];
+
+      expect(await movieService.update('cat123', dto)).toBe(result);
+      expect(categoryService.findOne).toHaveBeenCalledTimes(1);
+      expect(genreService.findOne).toHaveBeenCalledTimes(1);
    });
 
     it('should throw error if tries to update a not found movie', async () => {
