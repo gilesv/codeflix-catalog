@@ -1,4 +1,3 @@
-
 import * as request from 'supertest';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -85,6 +84,7 @@ describe('Movie endpoint', () => {
         isAvailable: true,
         categories: ["abc123", "def123"],
         genres: ["abc123", "agua"],
+        castMembers: ["egua", "kvalu"],
       };
 
       let result = MovieFactory.new();

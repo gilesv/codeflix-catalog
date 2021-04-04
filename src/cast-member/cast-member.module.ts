@@ -5,6 +5,7 @@ import { DbModule } from '../db/db.module';
 
 @Module({
   imports: [DbModule],
+  exports: [CastMemberService],
   controllers: [CastMemberController],
   providers: [CastMemberService]
 })

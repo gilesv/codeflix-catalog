@@ -1,4 +1,4 @@
-import { CastMember } from '.prisma/client';
+import { CastMember } from '@prisma/client';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { CreateCastMemberDto } from './dto/create-cast-member.dto';

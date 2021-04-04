@@ -9,21 +9,31 @@ import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import MovieFactory from './movie.factory';
 import { MovieService } from './movie.service';
+import { CastMemberService } from '../cast-member/cast-member.service';
+import CastMemberFactory from '../cast-member/cast-member.factory';
 
 describe('MovieService', () => {
   let movieService: MovieService;
   let categoryService: CategoryService;
   let genreService: GenreService;
+  let castMemberService: CastMemberService;
   let dbService: DbService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [MovieService, DbService, CategoryService, GenreService],
+      providers: [
+        MovieService,
+        DbService,
+        CategoryService,
+        GenreService,
+        CastMemberService
+      ],
     }).compile();
 
     movieService = module.get<MovieService>(MovieService);
     categoryService = module.get<CategoryService>(CategoryService);
     genreService = module.get<GenreService>(GenreService);
+    castMemberService = module.get<CastMemberService>(CastMemberService);
     dbService = module.get<DbService>(DbService);
   });
 
@@ -68,6 +78,16 @@ describe('MovieService', () => {
       await expect(movieService.create(dto)).rejects.toThrowError(NotFoundException);
       expect(dbService.movie.create).toHaveBeenCalledTimes(0);
     });
+
+    it('should throw error if any provided cast member does not exist', async () => {
+      jest.spyOn(dbService.movie, 'create').mockImplementation(jest.fn());
+      jest.spyOn(castMemberService, 'findOne').mockResolvedValueOnce(null);
+      let dto = new CreateMovieDto();
+      dto.castMembers = ["h2o"];
+
+      await expect(movieService.create(dto)).rejects.toThrowError(NotFoundException);
+      expect(dbService.movie.create).toHaveBeenCalledTimes(0);
+    });
   })
 
   it('findAll should list all movies', async () => {
@@ -92,15 +112,18 @@ describe('MovieService', () => {
       let result = MovieFactory.new('Movie B');
       let category = CategoryFactory.new();
       let genre = GenreFactory.new();
+      let castMember = CastMemberFactory.new();
 
       jest.spyOn(dbService.movie, 'findUnique').mockResolvedValueOnce(movie);
       jest.spyOn(dbService.movie, 'update').mockResolvedValueOnce(result);
       jest.spyOn(categoryService, 'findOne').mockResolvedValueOnce(category);
       jest.spyOn(genreService, 'findOne').mockResolvedValueOnce(genre);
+      jest.spyOn(castMemberService, 'findOne').mockResolvedValueOnce(castMember);
 
       let dto = new UpdateMovieDto();
       dto.categories = ["a"];
       dto.genres = ["b"];
+      dto.castMembers = ["c"];
 
       expect(await movieService.update('cat123', dto)).toBe(result);
       expect(categoryService.findOne).toHaveBeenCalledTimes(1);

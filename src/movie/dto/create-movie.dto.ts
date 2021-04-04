@@ -18,4 +18,7 @@ export class CreateMovieDto {
 
   @IsArray()
   genres: string[];
+
+  @IsArray()
+  castMembers: string[];
 }
