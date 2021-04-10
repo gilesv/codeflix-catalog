@@ -1,12 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, NotFoundException, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
-
+import { ConfigService } from '@nestjs/config';
 @Controller('movies')
 @UsePipes(new ValidationPipe())
 export class MovieController {
-  constructor(private readonly movieService: MovieService) {}
+  constructor(private readonly movieService: MovieService, private configService: ConfigService) {}
 
   @Post()
   async create(@Body() createMovieDto: CreateMovieDto) {

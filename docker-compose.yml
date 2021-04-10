@@ -5,9 +5,12 @@ services:
     build: .
     container_name: codeflix_catalog_api
     tty: true
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/keys/keyfile.json
     volumes:
       - .:/home/node/app
       - node_modules:/home/node/app/node_modules
+      - "${HOST_GCLOUD_KEYFILE}:/tmp/keys/keyfile.json:ro"
     networks:
       - catalog-net
     ports:
