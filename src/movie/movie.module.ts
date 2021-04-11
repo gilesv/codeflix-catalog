@@ -5,9 +5,16 @@ import { DbModule } from '../db/db.module';
 import { CategoryModule } from '../category/category.module';
 import { GenreModule } from '../genre/genre.module';
 import { CastMemberModule } from '../cast-member/cast-member.module';
+import { UploadModule } from '../upload/upload.module';
 
 @Module({
-  imports: [DbModule, CategoryModule, GenreModule, CastMemberModule],
+  imports: [
+    DbModule,
+    CategoryModule,
+    GenreModule,
+    CastMemberModule,
+    UploadModule,
+  ],
   controllers: [MovieController],
   providers: [MovieService]
 })

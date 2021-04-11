@@ -4,6 +4,7 @@ import { GenreModule } from './genre/genre.module';
 import { CastMemberModule } from './cast-member/cast-member.module';
 import { MovieModule } from './movie/movie.module';
 import { ConfigModule } from '@nestjs/config';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -11,7 +12,8 @@ import { ConfigModule } from '@nestjs/config';
     CategoryModule,
     GenreModule,
     CastMemberModule,
-    MovieModule
+    MovieModule,
+    UploadModule
   ],
 })
 export class AppModule {}

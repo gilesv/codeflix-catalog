@@ -6,14 +6,19 @@ import { UpdateMovieDto } from './dto/update-movie.dto';
 import { CategoryService } from '../category/category.service';
 import { GenreService } from '../genre/genre.service';
 import { CastMemberService } from '../cast-member/cast-member.service';
+import { FileDescriptor } from '../upload/file.interface';
+import { UploadService, UploadedFile } from 'src/upload/upload.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MovieService {
   constructor(
+    private config: ConfigService,
     private db: DbService,
     private categoryService: CategoryService,
     private genreService: GenreService,
-    private castMemberService: CastMemberService
+    private castMemberService: CastMemberService,
+    private uploadService: UploadService,
   ) {}
 
   private INCLUDE_ARGS: Prisma.MovieInclude = {
@@ -96,15 +101,20 @@ export class MovieService {
     });
   }
 
-  async findOne(id: string): Promise<Movie|null> {
-    return await this.db.movie.findUnique({
+  async findOne(id: string, throwNotFound: boolean = false): Promise<Movie|null> {
+    let movie = await this.db.movie.findUnique({
       where: { id },
       include: { ...this.INCLUDE_ARGS }
     });
+
+    if (throwNotFound && !movie) {
+      throw new NotFoundException("Movie not found");
+    }
+    return movie;
   }
 
   async update(id: string, updateMovieDto: UpdateMovieDto): Promise<Movie|null> {
-    await this.checkNotFound(id);
+    await this.findOne(id, true);
 
     let categories = await this.processCategories(updateMovieDto.categories);
     let genres = await this.processGenres(updateMovieDto.genres);
@@ -127,17 +137,23 @@ export class MovieService {
   }
 
   async remove(id: string): Promise<Movie|null> {
-    await this.checkNotFound(id);
+    await this.findOne(id, true);
     return await this.db.movie.update({
       where: { id },
       data: { isActive: false },
     });
   }
 
-  private async checkNotFound(id: string) {
-    let movie = await this.findOne(id);
-    if (!movie) {
-      throw new NotFoundException("Movie not found");
-    }
+  async uploadFile(id: string, file: FileDescriptor): Promise<UploadedFile> {
+    let movie = await this.findOne(id, true);
+    let options = {
+      bucket: this.config.get<string>('FILE_BUCKET_NAME'),
+      folder: this.generateMovieFolderName(movie),
+    };
+    return this.uploadService.upload(file, options);
+  }
+
+  private generateMovieFolderName(movie: Movie): string {
+    return `MOVIE_${movie.id}`;
   }
 }
