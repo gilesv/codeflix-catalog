@@ -7,7 +7,9 @@ import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { ConfigService } from '@nestjs/config';
+import { MovieFile } from '@prisma/client';
 const Busboy = require('busboy');
+
 @Controller('movies')
 @UsePipes(new ValidationPipe())
 export class MovieController {
@@ -24,8 +26,8 @@ export class MovieController {
       res.status(HttpStatus.BAD_REQUEST).end("No files provided");
     }
 
-    let busboy = new Busboy({ headers: req.headers });
-    let uploads = [];
+    let busboy = new Busboy({ headers: req.headers, limits: { files: 1 } });
+    let upload: Promise<MovieFile>;
 
     let onFile = (
       fieldname: string,
@@ -34,20 +36,22 @@ export class MovieController {
       encoding: string,
       mimetype: string
       ) => {
-        uploads.push(this.movieService.uploadFile(id, {
+        upload = this.movieService.uploadFile(id, {
           label: fieldname,
           name: filename,
           encoding,
           mimetype,
           content: file,
-        }));
+        });
     };
 
     let onFinish = async () => {
       try {
-        await Promise.all(uploads);
-        res.status(HttpStatus.OK).end();
+        let movieFile = await upload;
+        res.status(HttpStatus.OK)
+          .end(JSON.stringify(movieFile));
       } catch (e) {
+        console.log(e);
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).end(e.message);
       }
     };

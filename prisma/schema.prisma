@@ -53,4 +53,20 @@ model Movie {
   categories    Category[]
   genres        Genre[]
   castMembers   CastMember[]
+  files         MovieFile[]
+}
+
+model MovieFile {
+  id            String          @id @default(uuid())
+  name          String
+  kind          String
+  url           String
+  movie         Movie           @relation(fields: [movieId], references: [id])
+  movieId       String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime?
+  version       Int             @default(1)
+
+  // Constraints
+  @@unique([name, movieId], name: "MovieFile_UniqueNameForMovie")
 }

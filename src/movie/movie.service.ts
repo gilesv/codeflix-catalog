@@ -1,4 +1,4 @@
-import { Movie, Prisma } from '@prisma/client';
+import { Movie, MovieFile, Prisma } from '@prisma/client';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
@@ -7,8 +7,10 @@ import { CategoryService } from '../category/category.service';
 import { GenreService } from '../genre/genre.service';
 import { CastMemberService } from '../cast-member/cast-member.service';
 import { FileDescriptor } from '../upload/file.interface';
-import { UploadService, UploadedFile } from 'src/upload/upload.service';
+import { MimeType, UploadService } from '../upload/upload.service';
 import { ConfigService } from '@nestjs/config';
+import { MovieFileService } from './movie-file.service';
+import * as path from 'path';
 
 @Injectable()
 export class MovieService {
@@ -19,6 +21,7 @@ export class MovieService {
     private genreService: GenreService,
     private castMemberService: CastMemberService,
     private uploadService: UploadService,
+    private movieFileService: MovieFileService,
   ) {}
 
   private INCLUDE_ARGS: Prisma.MovieInclude = {
@@ -144,16 +147,22 @@ export class MovieService {
     });
   }
 
-  async uploadFile(id: string, file: FileDescriptor): Promise<UploadedFile> {
+  async uploadFile(id: string, file: FileDescriptor): Promise<MovieFile> {
     let movie = await this.findOne(id, true);
-    let options = {
+
+    // Reset the file name
+    file.name = file.label + path.extname(file.name);
+    let uploadedFile = await this.uploadService.upload(file, {
       bucket: this.config.get<string>('FILE_BUCKET_NAME'),
-      folder: this.generateMovieFolderName(movie),
-    };
-    return this.uploadService.upload(file, options);
+      accept: [MimeType.MP4, MimeType.JPEG, MimeType.PNG],
+      fileName: this.getFileNameWithFolder(movie, file),
+    });
+    let movieFile = await this.movieFileService.save(movie, uploadedFile);
+
+    return movieFile;
   }
 
-  private generateMovieFolderName(movie: Movie): string {
-    return `MOVIE_${movie.id}`;
+  private getFileNameWithFolder(movie: Movie, file: FileDescriptor): string {
+    return `MOVIE_${movie.id}/${file.name}`;
   }
 }
