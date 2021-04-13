@@ -21,43 +21,52 @@ export class MovieController {
   }
 
   @Post(':id')
-  async addMedia(@Param('id') id: string, @Req() req: Request, @Res() res: Response): Promise<void> {
+  async addMedia(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
+    res.type('json');
+
+    let json = (data) => JSON.stringify(data);
+    const fail = (status: HttpStatus, errorMessage: string) => {
+      res.status(status).end(json({
+        statusCode: status,
+        error: errorMessage
+      }));
+    };
+    const end = (payload: MovieFile) => {
+      res.status(HttpStatus.OK).end(json(payload));
+    }
+
     if (!req.headers['content-type']) {
-      res.status(HttpStatus.BAD_REQUEST).end("No files provided");
+      fail(HttpStatus.BAD_REQUEST, "No file provided")
     }
 
     let busboy = new Busboy({ headers: req.headers, limits: { files: 1 } });
-    let upload: Promise<MovieFile>;
 
-    let onFile = (
+    let onFile = async (
       fieldname: string,
       file: NodeJS.ReadableStream,
       filename: string,
       encoding: string,
       mimetype: string
       ) => {
-        upload = this.movieService.uploadFile(id, {
-          label: fieldname,
-          name: filename,
-          encoding,
-          mimetype,
-          content: file,
-        });
-    };
-
-    let onFinish = async () => {
-      try {
-        let movieFile = await upload;
-        res.status(HttpStatus.OK)
-          .end(JSON.stringify(movieFile));
-      } catch (e) {
-        console.log(e);
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).end(e.message);
-      }
+        try {
+          let movieFile = await this.movieService.uploadFile(id, {
+            label: fieldname,
+            name: filename,
+            content: file,
+            encoding,
+            mimetype,
+          });
+          end(movieFile);
+        } catch (e) {
+          req.unpipe();
+          fail(HttpStatus.INTERNAL_SERVER_ERROR, e.message);
+        }
     };
 
     busboy.on('file', onFile);
-    busboy.on('finish', onFinish);
+    busboy.on('finish', () => req.unpipe());
+    busboy.on('error', (e) => fail(HttpStatus.INTERNAL_SERVER_ERROR, e.message));
+
     req.pipe(busboy);
   }
 

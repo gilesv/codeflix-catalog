@@ -28,6 +28,7 @@ export class MovieService {
     categories: { select: { id: true, name: true } },
     genres: { select: { id: true, name: true } },
     castMembers: { select: { id: true, name: true, type: true } },
+    files: { select: { id: true, name: true, kind: true, url: true, version: true }}
   };
 
   async create(createMovieDto: CreateMovieDto): Promise<Movie> {
