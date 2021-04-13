@@ -4,6 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MovieModule } from './movie.module';
 import { MovieService } from './movie.service';
 import MovieFactory from './movie.factory';
+import { ConfigModule } from '@nestjs/config';
 
 describe('Movie endpoint', () => {
   let module: TestingModule;
@@ -18,7 +19,12 @@ describe('Movie endpoint', () => {
 
   beforeAll(async () => {
     module = await Test
-      .createTestingModule({ imports: [MovieModule] })
+      .createTestingModule({
+        imports: [
+          MovieModule,
+          ConfigModule.forRoot({ isGlobal: true })
+        ],
+      })
       .overrideProvider(MovieService).useValue(movieService)
       .compile();
 

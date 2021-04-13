@@ -11,6 +11,11 @@ import MovieFactory from './movie.factory';
 import { MovieService } from './movie.service';
 import { CastMemberService } from '../cast-member/cast-member.service';
 import CastMemberFactory from '../cast-member/cast-member.factory';
+import { UploadService, MimeType } from '../upload/upload.service';
+import { MovieFileService } from './movie-file.service';
+import { ConfigService } from '@nestjs/config';
+import * as stream from 'stream';
+import MovieFileFactory from './movie-file.factory';
 
 describe('MovieService', () => {
   let movieService: MovieService;
@@ -18,6 +23,9 @@ describe('MovieService', () => {
   let genreService: GenreService;
   let castMemberService: CastMemberService;
   let dbService: DbService;
+  let uploadService: UploadService;
+  let movieFileService: MovieFileService;
+  let configService: ConfigService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -26,7 +34,11 @@ describe('MovieService', () => {
         DbService,
         CategoryService,
         GenreService,
-        CastMemberService
+        DbService,
+        CastMemberService,
+        MovieFileService,
+        UploadService,
+        ConfigService,
       ],
     }).compile();
 
@@ -35,6 +47,9 @@ describe('MovieService', () => {
     genreService = module.get<GenreService>(GenreService);
     castMemberService = module.get<CastMemberService>(CastMemberService);
     dbService = module.get<DbService>(DbService);
+    uploadService = module.get<UploadService>(UploadService);
+    movieFileService = module.get<MovieFileService>(MovieFileService);
+    configService = module.get<ConfigService>(ConfigService);
   });
 
   it('should be defined', () => {
@@ -156,6 +171,49 @@ describe('MovieService', () => {
 
       await expect(movieService.remove('000-000-000-001'))
         .rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('uploadFile', () => {
+    it('should throw error if tries to upload a file to a not found movie', async () => {
+      jest.spyOn(dbService.movie, 'findUnique').mockResolvedValueOnce(null);
+
+      let file = {
+        label: 'main',
+        name: 'image.jpg',
+        encoding: 'base64',
+        mimetype: 'image/jpg',
+        content: new stream.Readable(),
+      };
+
+      await expect(movieService.uploadFile('000', file))
+        .rejects.toThrow(NotFoundException);
+    });
+
+    it('should upload file save as MovieFile', async () => {
+      let movieFile = MovieFileFactory.new();
+      let uploadedFile = {
+        name: 'abc',
+        kind: MimeType.JPEG,
+        url: 'abc/def',
+      };
+      jest.spyOn(dbService.movie, 'findUnique').mockResolvedValueOnce(MovieFactory.new());
+      jest.spyOn(uploadService, 'upload').mockResolvedValue(uploadedFile);
+      jest.spyOn(movieFileService, 'save').mockResolvedValueOnce(movieFile);
+
+      let file = {
+        label: 'main',
+        name: 'image.jpg',
+        encoding: 'base64',
+        mimetype: 'image/jpg',
+        content: new stream.Readable(),
+      };
+
+      let result = await movieService.uploadFile('000', file);
+      expect(result).toBe(movieFile);
+      expect(file.name).toBe('main.jpg');
+      expect(dbService.movie.findUnique).toHaveBeenCalledTimes(1);
+      expect(uploadService.upload).toHaveBeenCalledTimes(1);
     });
   });
 });
