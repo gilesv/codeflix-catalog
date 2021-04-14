@@ -7,6 +7,9 @@ services:
     tty: true
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/tmp/keys/keyfile.json
+      - WAIT_FOR_DB_URL=db:5432
+    env_file:
+      - .env
     volumes:
       - .:/home/node/app
       - node_modules:/home/node/app/node_modules
@@ -17,16 +20,6 @@ services:
       - 3000:8080
     depends_on:
       - db
-
-  # nginx:
-  #   build: ./nginx
-  #   container_name: codeflix_catalog_nginx
-  #   networks:
-  #     - catalog-net
-  #   ports:
-  #     - 8080:80
-  #   depends_on:
-  #     - nodeapi
 
   db:
     image: postgres
@@ -51,4 +44,3 @@ networks:
 volumes:
   node_modules:
   pgdata:
-

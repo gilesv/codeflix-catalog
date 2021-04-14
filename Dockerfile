@@ -10,5 +10,17 @@ COPY --chown=node:node package*.json ./
 RUN npm install
 COPY --chown=node:node . .
 
+RUN cd .docker && ls -la
+RUN chmod +x ./.docker/wait-for-it.sh
+
+# Default database host and port
+ENV WAIT_FOR_DB_URL db:5432
+ENV WAIT_FOR_TIMEOUT 10
+
 EXPOSE 8080
-CMD ["npm", "run", "start:debug"]
+
+# Wait for database to be available in order to start app
+ENTRYPOINT .docker/wait-for-it.sh $WAIT_FOR_DB_URL \
+    -t $WAIT_FOR_TIMEOUT --strict -- \
+    npm run start:debug
+
