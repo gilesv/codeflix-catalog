@@ -1,7 +1,19 @@
-FROM node:12
+FROM node:15-alpine
 
+# Add bash
+RUN apk update
+RUN apk upgrade
+RUN apk add bash
+RUN apk add git
+
+ENV NPM_CONFIG_LOGLEVEL warn
+ENV WAIT_FOR_DB_URL db:5432
+ENV WAIT_FOR_TIMEOUT 10
+
+# Add Nest.js
 RUN npm i -g nest
 
+# Configure and build project
 USER node
 RUN mkdir -p /home/node/app
 WORKDIR /home/node/app
@@ -10,17 +22,10 @@ COPY --chown=node:node package*.json ./
 RUN npm install
 COPY --chown=node:node . .
 
-RUN cd .docker && ls -la
 RUN chmod +x ./.docker/wait-for-it.sh
-
-# Default database host and port
-ENV WAIT_FOR_DB_URL db:5432
-ENV WAIT_FOR_TIMEOUT 10
+RUN chmod +x ./.docker/entrypoint.sh
 
 EXPOSE 8080
 
-# Wait for database to be available in order to start app
-ENTRYPOINT .docker/wait-for-it.sh $WAIT_FOR_DB_URL \
-    -t $WAIT_FOR_TIMEOUT --strict -- \
-    npm run start:debug
-
+ENTRYPOINT [".docker/entrypoint.sh"]
+CMD ["npm", "run", "start:debug"]
