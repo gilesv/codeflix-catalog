@@ -12,7 +12,7 @@ services:
       - ./api/.env
     volumes:
       - ./api:/home/node/app
-      - node_modules:/home/node/app/node_modules
+      - api_node_modules:/home/node/app/node_modules
       - "${GCLOUD_KEYFILE}:/tmp/keys/keyfile.json:ro"
     command: npm run start:debug
     networks:
@@ -43,5 +43,10 @@ networks:
     driver: bridge
 
 volumes:
-  node_modules:
+  api_node_modules:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./api/node_modules
   pgdata:
