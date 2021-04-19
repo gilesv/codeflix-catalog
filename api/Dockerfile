@@ -4,14 +4,10 @@ FROM node:15-alpine
 RUN apk update
 RUN apk upgrade
 RUN apk add bash
-RUN apk add git
 
 ENV NPM_CONFIG_LOGLEVEL warn
 ENV WAIT_FOR_DB_URL db:5432
 ENV WAIT_FOR_TIMEOUT 10
-
-# Add Nest.js
-RUN npm i -g nest
 
 # Configure and build project
 USER node
