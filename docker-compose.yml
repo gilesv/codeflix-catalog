@@ -1,19 +1,19 @@
 version: '3.8'
 
 services:
-  catalog:
-    build: .
+  catalog-api:
+    build: ./api
     container_name: codeflix_catalog_api
     tty: true
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/tmp/keys/keyfile.json
       - WAIT_FOR_DB_URL=db:5432
     env_file:
-      - .env
+      - ./api/.env
     volumes:
-      - .:/home/node/app
+      - ./api:/home/node/app
       - node_modules:/home/node/app/node_modules
-      - "${HOST_GCLOUD_KEYFILE}:/tmp/keys/keyfile.json:ro"
+      - "${GCLOUD_KEYFILE}:/tmp/keys/keyfile.json:ro"
     command: npm run start:debug
     networks:
       - catalog-net
