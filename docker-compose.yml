@@ -1,6 +1,18 @@
 version: '3.8'
 
 services:
+  frontend:
+    build: ./frontend
+    container_name: codeflix_catalog_frontend
+    volumes:
+      - ./frontend:/home/node/app
+      - frontend_node_modules:/home/node/app/node_modules
+    command: sleep infinity
+    networks:
+      - catalog-net
+    ports:
+      - 3001:3000
+
   catalog-api:
     build: ./api
     container_name: codeflix_catalog_api
@@ -43,10 +55,16 @@ networks:
     driver: bridge
 
 volumes:
+  pgdata:
   api_node_modules:
     driver: local
     driver_opts:
       type: none
       o: bind
       device: ./api/node_modules
-  pgdata:
+  frontend_node_modules:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./frontend/node_modules
