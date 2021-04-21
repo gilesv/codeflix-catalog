@@ -1,6 +1,7 @@
 import React, { useState} from "react";
 import { Box, Heading, Flex, Text, Button } from "@chakra-ui/react";
 import { DarkModeSwitch } from "./DarkModeSwitch";
+import Link from 'next/link';
 
 const MenuItems = ({ children }: { children: any }) => (
   <Text mt={{ base: 4, md: 0 }} mr={6} display="block">
@@ -47,8 +48,8 @@ const Header = (props: any) => {
         alignItems="center"
         flexGrow={1}
       >
-        <MenuItems>Filmes</MenuItems>
-        <MenuItems>Categorias</MenuItems>
+        <MenuItems><Link href="/">Filmes</Link></MenuItems>
+        <MenuItems><Link href="/categories">Categorias</Link></MenuItems>
         <MenuItems>Gêneros</MenuItems>
         <MenuItems>Cast</MenuItems>
       </Box>
