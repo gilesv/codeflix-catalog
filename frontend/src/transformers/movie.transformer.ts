@@ -1,18 +1,5 @@
 import { Movie } from "../interfaces/movie";
-import { toNumber, toDate } from "./util";
-
-export function IntoMovies(data: any[]): Movie[] {
-  if (Array.isArray(data)) {
-    let movies: Movie[] = [];
-    for (let movie of data) {
-      if (typeof movie === "object") {
-        movies.push(IntoMovie(movie));
-      }
-    }
-    return movies;
-  }
-  return [];
-}
+import { toNumber, toDate, intoArrayOf } from "./util";
 
 export function IntoMovie(data: any): Movie {
   return {
@@ -26,3 +13,5 @@ export function IntoMovie(data: any): Movie {
     updatedAt: toDate(data?.updatedAt),
   }
 }
+
+export const IntoMovies = intoArrayOf<Movie>(IntoMovie);

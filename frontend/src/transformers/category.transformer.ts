@@ -1,18 +1,5 @@
 import { Category } from "../interfaces/category";
-import { toDate } from "./util";
-
-export function IntoCategories(data: any[]): Category[] {
-  if (Array.isArray(data)) {
-    let categories: Category[] = [];
-    for (let category of data) {
-      if (typeof category === "object") {
-        categories.push(IntoCategory(category));
-      }
-    }
-    return categories;
-  }
-  return [];
-}
+import { toDate, intoArrayOf } from "./util";
 
 export function IntoCategory(data: any): Category {
   return {
@@ -24,3 +11,5 @@ export function IntoCategory(data: any): Category {
     updatedAt: toDate(data?.updatedAt),
   }
 }
+
+export const IntoCategories = intoArrayOf<Category>(IntoCategory);
