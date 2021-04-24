@@ -50,7 +50,7 @@ const Header = (props: any) => {
       >
         <MenuItems><Link href="/">Filmes</Link></MenuItems>
         <MenuItems><Link href="/categories">Categorias</Link></MenuItems>
-        <MenuItems>Gêneros</MenuItems>
+        <MenuItems><Link href="/genres">Gêneros</Link></MenuItems>
         <MenuItems>Cast</MenuItems>
       </Box>
 
