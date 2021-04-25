@@ -1,4 +1,5 @@
 import { Heading } from '@chakra-ui/layout';
+import { Spinner } from '@chakra-ui/spinner';
 import { useToast } from '@chakra-ui/toast';
 import { useRouter } from 'next/dist/client/router';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -14,7 +15,7 @@ const MovieDetails = () => {
   // get movie
   const router = useRouter();
   const { id } = router.query;
-  let {isLoading, data: movie, error } = useQuery(['movie', id], () => fetchMovie(id as string));
+  let { isLoading, data: movie, error } = useQuery(['movie', id], () => fetchMovie(id as string));
 
   // toast
   const toast = useToast();
@@ -46,25 +47,23 @@ const MovieDetails = () => {
   let saveMovie = (movie: Movie) => {
     mutation.mutate(movie);
   };
-  
-  if (error) {
-    return <span>filme não encontrado</span>;
-  }
 
-  if (isLoading) {
-    return <span>carregando...</span>;
-  }
-
-  return movie ? (
+  return (
     <Container>
       <Main mt={0} pt={20}>
-        <Heading>{movie.title}</Heading>
-        <MovieForm movie={movie} saveMovie={saveMovie} />
+        { isLoading && <Spinner />}
+        { error && <Heading>Filme não encontrado</Heading> }
+        {
+          movie && <>
+            <Heading>{movie.title}</Heading>
+            <MovieForm movie={movie} saveMovie={saveMovie} />
+          </>
+        }
       </Main>
       <Footer>
       </Footer>
     </Container>
-  ) : null;
+  );
 }
 
 export default MovieDetails;
