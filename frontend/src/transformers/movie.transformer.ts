@@ -11,6 +11,9 @@ export function IntoMovie(data: any): Movie {
     isActive: data?.isActive,
     createdAt: toDate(data?.createdAt),
     updatedAt: toDate(data?.updatedAt),
+    categories: [],
+    genres: [],
+    castMembers: [],
   }
 }
 

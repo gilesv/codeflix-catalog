@@ -11,8 +11,11 @@ async function sendRequest(method: HttpMethod, url: string, body?: any) {
   if (method === "POST" || method === "PATCH") {
     options.body = body;
   }
-  let payload = await fetch(`http://localhost:3000${url}`, options);
-  let json = await payload.json();
+  let result = await fetch(`http://localhost:3000${url}`, options);
+  let json = await result.json();
+  if (!result.ok) {
+    throw new Error(json.message);
+  }
   return json;
 }
 
@@ -21,11 +24,11 @@ export function httpGet(url: string) {
 }
 
 export function httpPost(url: string, body: any) {
-  return sendRequest("POST", url, body);
+  return sendRequest("POST", url, JSON.stringify(body));
 }
 
 export function httpPatch(url: string, body: any) {
-  return sendRequest("PATCH", url, body);
+  return sendRequest("PATCH", url, JSON.stringify(body));
 }
 
 export function httpDelete(url: string) {

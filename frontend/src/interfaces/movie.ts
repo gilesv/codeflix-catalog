@@ -7,4 +7,7 @@ export interface Movie {
   isActive: boolean,
   createdAt: Date|null,
   updatedAt: Date|null,
+  categories: any[],
+  genres: any[],
+  castMembers: any[]
 }

@@ -3,6 +3,7 @@ import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/table";
 import { IconButton } from "@chakra-ui/button";
 import { SearchIcon } from "@chakra-ui/icons";
 import { Badge } from "@chakra-ui/layout";
+import Link from "next/link";
 
 interface Props {
   movies: any[],
@@ -34,9 +35,11 @@ const MovieRow: FC<{ movie: any}> = ({ movie }) => {
       <Td>{movie.createdAt?.toLocaleDateString?.()}</Td>
       <Td><Badge>{movie.isAvailable ? "Liberado" : "Oculto"}</Badge></Td>
       <Td>
-        <IconButton
-          aria-label="Detalhes do filme"
-          icon={<SearchIcon />} size="sm" />
+        <Link href={`/movies/${movie.id}`}>
+          <IconButton
+            aria-label="Detalhes do filme"
+            icon={<SearchIcon />} size="sm" />
+        </Link>
       </Td>
     </Tr>
   );
