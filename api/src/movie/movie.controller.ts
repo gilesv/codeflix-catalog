@@ -20,7 +20,7 @@ export class MovieController {
     return await this.movieService.create(createMovieDto);
   }
 
-  @Post(':id')
+  @Post(':id/files')
   async addMedia(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
     res.type('json');
 

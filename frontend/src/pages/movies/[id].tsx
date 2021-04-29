@@ -1,5 +1,6 @@
 import { Heading } from '@chakra-ui/layout';
 import { Spinner } from '@chakra-ui/spinner';
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/tabs';
 import { useToast } from '@chakra-ui/toast';
 import { useRouter } from 'next/dist/client/router';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -7,6 +8,7 @@ import { Container } from '../../components/Container';
 import { Footer } from '../../components/Footer';
 import { Main } from '../../components/Main';
 import MovieForm from '../../components/movie/MovieForm';
+import { MovieUploads } from '../../components/movie/MovieUploads';
 import { Movie } from '../../interfaces/movie';
 import { fetchMovie, updateMovie } from '../../queries/movie';
 import { IntoMovie } from '../../transformers/movie.transformer';
@@ -56,7 +58,20 @@ const MovieDetails = () => {
         {
           movie && <>
             <Heading>{movie.title}</Heading>
-            <MovieForm movie={movie} saveMovie={saveMovie} />
+            <Tabs>
+              <TabList>
+                <Tab>Detalhes</Tab>
+                <Tab>Arquivos</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  <MovieForm movie={movie} saveMovie={saveMovie} />
+                </TabPanel>
+                <TabPanel>
+                  <MovieUploads movie={movie} />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
           </>
         }
       </Main>

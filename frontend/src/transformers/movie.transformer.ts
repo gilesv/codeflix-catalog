@@ -1,4 +1,5 @@
 import { Movie } from "../interfaces/movie";
+import { IntoMovieFiles } from "./movie-file.transformer";
 import { toNumber, toDate, intoArrayOf } from "./util";
 
 export function IntoMovie(data: any): Movie {
@@ -14,6 +15,7 @@ export function IntoMovie(data: any): Movie {
     categories: [],
     genres: [],
     castMembers: [],
+    files: IntoMovieFiles(data?.files),
   }
 }
 

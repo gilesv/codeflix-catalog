@@ -7,7 +7,7 @@ services:
     volumes:
       - ./frontend:/home/node/app
       - frontend_node_modules:/home/node/app/node_modules
-    command: sleep infinity
+    command: npm run dev
     networks:
       - catalog-net
     ports:

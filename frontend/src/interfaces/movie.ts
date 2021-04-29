@@ -1,3 +1,5 @@
+import { MovieFile } from "./movie-file";
+
 export interface Movie {
   id: string,
   title: string,
@@ -10,4 +12,5 @@ export interface Movie {
   categories: any[],
   genres: any[],
   castMembers: any[]
+  files: MovieFile[]
 }
